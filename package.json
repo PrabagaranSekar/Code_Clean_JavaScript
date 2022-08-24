@@ -1,0 +1,22 @@
+{
+  "name": "movies_comparison",
+  "version": "1.0.0",
+  "description": "compare two movies",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "parcel index.html",
+    "build": "parcel build index.html",
+    "json:server": "json-server --watch fake_movies.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "json-server": "^0.17.0"
+  },
+  "devDependencies": {
+    "jest": "^28.1.2",
+    "parcel-bundler": "^1.12.5"
+  }
+}
