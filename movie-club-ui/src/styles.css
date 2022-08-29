@@ -1,0 +1,14 @@
+@import "~ng-zorro-antd/ng-zorro-antd.min.css";
+@import "~ng-zorro-antd/style/index.min.css";
+
+/* Import base styles */
+@import "~ng-zorro-antd/button/style/index.min.css";
+
+/* material module css */
+/* material module css */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+body{
+    font-family: emoji !important;
+}

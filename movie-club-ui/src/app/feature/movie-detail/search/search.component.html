@@ -1,0 +1,274 @@
+<div class="search-flat">
+    <div class="flat-left-room">
+        <div class="left-room-left">
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Search for a movie</label>
+                <ng-autocomplete id="firstMovie" [data]="firstMovieSuggestionList"
+                    historyIdentifier='firstMovieSuggestionList' [searchKeyword]="movieSearchKeyword"
+                    (selected)='selectedMovie($event,1)' (inputChanged)='getMovieSuggestionList($event,1)'
+                    (inputFocused)='onFocused($event)' [itemTemplate]="movieSuggestionTemplate"
+                    (inputCleared)="searchCleared()" [notFoundTemplate]="movieNotFoundTemplate" [debounceTime]="150"
+                    [isLoading]="isLoadingResult" [minQueryLength]="2" placeHolder="Search Movies. eg 'gun'">
+                </ng-autocomplete>
+
+            </div>
+            <!-- <app-search-result *ngIf="!isFirstMovieResponse"></app-search-result> -->
+            <div class="flat-left-room-result" *ngIf="isFirstMovieResponse">
+                <div>
+                    <section class="movie-title-card section-div">
+                        <div class="poster-rm">
+                            <img class="movie-poster" [src]="firstMovieDetails.Poster">
+                        </div>
+                        <div class="content-rm">
+                            <h1>{{firstMovieDetails.Title}}</h1>
+                            <h4>{{firstMovieDetails.Genre}}</h4>
+                            <p>{{firstMovieDetails.Plot}}</p>
+                        </div>
+
+                    </section>
+                    <section class="movie-title section-div">
+                        <mat-card class="example-card">
+                            <mat-card-title class="movie-title-card">Awards
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{firstMovieDetails.Awards}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card"
+                            [style.background-color]="getBoxOfficeColor(firstMovieDetails.BoxOffice)">
+                            <mat-card-title class="movie-title-card">Box Office
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{firstMovieDetails.BoxOffice}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card"
+                            [style.background-color]="calculateMetaScore(firstMovieDetails.Metascore)">
+                            <mat-card-title class="movie-title-card">Meta Score
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{firstMovieDetails.Metascore}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card"
+                            [style.background-color]="getImdbRatingColor(firstMovieDetails.imdbRating)">
+                            <mat-card-title class="movie-title-ca/=rd">IMDB Rating
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{firstMovieDetails.imdbRating}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card"
+                            [style.background-color]="getIMDBVotesColor(firstMovieDetails.imdbVotes)">
+                            <mat-card-title class="movie-title-card">IMDB Votes
+
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{firstMovieDetails.imdbVotes}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="metascore=rm">
+
+                    </section>
+                </div>
+                <!-- <app-search-result></app-search-result> -->
+            </div>
+        </div>
+
+
+        <div class="left-room-right">
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Search for a movie</label>
+                <ng-autocomplete id="firstMovie" [data]="secondMovieSuggestionList"
+                    historyIdentifier='secondMovieSuggestionList' [searchKeyword]="movieSearchKeyword"
+                    (selected)='selectedMovie($event,2)' (inputChanged)='getMovieSuggestionList($event,2)'
+                    (inputFocused)='onFocused($event)' [itemTemplate]="movieSuggestionTemplate"
+                    (inputCleared)="searchCleared()" [notFoundTemplate]="movieNotFoundTemplate" [debounceTime]="150"
+                    [isLoading]="isLoadingResult" [minQueryLength]="2" placeHolder="Search Movies. eg 'gun'">
+                </ng-autocomplete>
+            </div>
+            <div class="flat-right-room-result" *ngIf="isSecondMovieResponse">
+                <div>
+                    <section class="movie-title-card section-div">
+                        <div class="poster-rm">
+                            <img class="movie-poster" [src]="secondMovieDetails.Poster">
+                        </div>
+                        <div class="content-rm">
+                            <h1>{{secondMovieDetails.Title}}</h1>
+                            <h4>{{secondMovieDetails.Genre}}</h4>
+                            <p>{{secondMovieDetails.Plot}}</p>
+                        </div>
+
+                    </section>
+                    <section class="movie-title section-div">
+                        <mat-card class="example-card">
+                            <mat-card-title class="movie-title-card">Awards
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{secondMovieDetails.Awards}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card">
+                            <mat-card-title class="movie-title-card">Box Office
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{secondMovieDetails.BoxOffice}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card">
+                            <mat-card-title class="movie-title-card">Meta Score
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{secondMovieDetails.Metascore}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card">
+                            <mat-card-title class="movie-title-ca/=rd">IMDB Rating
+                                <!-- <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i> -->
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{secondMovieDetails.imdbRating}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="award-rm section-div">
+                        <mat-card class="example-card">
+                            <mat-card-title class="movie-title-card">IMDB Votes
+                                <i nz-icon>
+                                    <img class="content-icon-img" rel="icon" type="image/png"
+                                        src="../../../assets/icons/trophy.png">
+                                </i>
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{secondMovieDetails.imdbVotes}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+
+                    <section class="metascore=rm">
+
+                    </section>
+                </div>
+                <!-- <app-search-result></app-search-result> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="flat-right-room">
+        <nz-card class="card-room" nzTitle="Card title" [nzExtra]="extraTemplate">
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+        </nz-card>
+        <ng-template #extraTemplate>
+            <a>More</a>
+        </ng-template>
+    </div>
+</div>
+
+
+<!-- Suggest List Template -->
+<ng-template #movieSuggestionTemplate let-item>
+    <a href="javascript:void(0)">
+        <div class="result-room">
+            <div class="result-room-left">
+                <img [src]="item.Poster" style="width:50px" />
+            </div>
+            <div class="result-room-right">
+                <span [innerHTML]="item.Title"></span><i>({{item.Year}})</i>
+            </div>
+        </div>
+    </a>
+</ng-template>
+
+<!-- No Result Found Template -->
+<ng-template #movieNotFoundTemplate let-notFound>
+    {{errorMsg}}
+</ng-template>

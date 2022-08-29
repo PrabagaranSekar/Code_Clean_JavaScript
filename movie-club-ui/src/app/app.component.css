@@ -1,0 +1,25 @@
+.logo-main {
+    color: #fff;
+    display: flex;
+    align-items: flex-end;
+    font-size: calc(15px + 2vw);
+    flex-direction: row;
+}
+
+.movie-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    height: 100px;
+    font-family: emoji;
+    font-size: 2rem;
+}
+.content-icon-img{
+    height: 80px;
+    width: 80px;
+}
+
+.title-room{
+    margin-right: 8px;
+}
