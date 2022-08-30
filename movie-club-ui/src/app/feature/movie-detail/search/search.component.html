@@ -27,12 +27,21 @@
 
                     </section>
                     <section class="movie-title section-div">
+                        <mat-card class="example-card"
+                            [style.background-color]="getWinningPercentageColour(firstMovieDetails.Awards)">
+                            <mat-card-title class="movie-title-card">Movie Winning Percentage
+                            </mat-card-title>
+                            <mat-card-content>
+                                <h5>{{calculateWiningPercentage(firstMovieDetails.Awards)}}</h5>
+                            </mat-card-content>
+                            <mat-card-footer>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                            </mat-card-footer>
+                        </mat-card>
+                    </section>
+                    <section class="movie-title section-div">
                         <mat-card class="example-card">
                             <mat-card-title class="movie-title-card">Awards
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
                             </mat-card-title>
                             <mat-card-content>
                                 <h5>{{firstMovieDetails.Awards}}</h5>
@@ -48,16 +57,11 @@
                         <mat-card class="example-card"
                             [style.background-color]="getBoxOfficeColor(firstMovieDetails.BoxOffice)">
                             <mat-card-title class="movie-title-card">Box Office
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
                             </mat-card-title>
                             <mat-card-content>
                                 <h5>{{firstMovieDetails.BoxOffice}}</h5>
                             </mat-card-content>
                             <mat-card-footer>
-                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
                             </mat-card-footer>
                         </mat-card>
                     </section>
@@ -66,10 +70,6 @@
                         <mat-card class="example-card"
                             [style.background-color]="calculateMetaScore(firstMovieDetails.Metascore)">
                             <mat-card-title class="movie-title-card">Meta Score
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
                             </mat-card-title>
                             <mat-card-content>
                                 <h5>{{firstMovieDetails.Metascore}}</h5>
@@ -84,10 +84,6 @@
                         <mat-card class="example-card"
                             [style.background-color]="getImdbRatingColor(firstMovieDetails.imdbRating)">
                             <mat-card-title class="movie-title-ca/=rd">IMDB Rating
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
                             </mat-card-title>
                             <mat-card-content>
                                 <h5>{{firstMovieDetails.imdbRating}}</h5>
@@ -117,7 +113,6 @@
 
                     </section>
                 </div>
-                <!-- <app-search-result></app-search-result> -->
             </div>
         </div>
 
@@ -144,96 +139,18 @@
                             <h4>{{secondMovieDetails.Genre}}</h4>
                             <p>{{secondMovieDetails.Plot}}</p>
                         </div>
-
                     </section>
-                    <section class="movie-title section-div">
+                    <section class="movie-title section-div" *ngFor="let key of movieDetailKeys">
                         <mat-card class="example-card">
-                            <mat-card-title class="movie-title-card">Awards
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
+                            <mat-card-title class="movie-title-card">{{key}}
                             </mat-card-title>
                             <mat-card-content>
-                                <h5>{{secondMovieDetails.Awards}}</h5>
+                                <h5>{{secondMovieDetails[key]}}</h5>
                             </mat-card-content>
                             <mat-card-footer>
                                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                             </mat-card-footer>
                         </mat-card>
-                    </section>
-
-
-                    <section class="award-rm section-div">
-                        <mat-card class="example-card">
-                            <mat-card-title class="movie-title-card">Box Office
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
-                            </mat-card-title>
-                            <mat-card-content>
-                                <h5>{{secondMovieDetails.BoxOffice}}</h5>
-                            </mat-card-content>
-                            <mat-card-footer>
-                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
-                            </mat-card-footer>
-                        </mat-card>
-                    </section>
-
-                    <section class="award-rm section-div">
-                        <mat-card class="example-card">
-                            <mat-card-title class="movie-title-card">Meta Score
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
-                            </mat-card-title>
-                            <mat-card-content>
-                                <h5>{{secondMovieDetails.Metascore}}</h5>
-                            </mat-card-content>
-                            <mat-card-footer>
-                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-                            </mat-card-footer>
-                        </mat-card>
-                    </section>
-
-                    <section class="award-rm section-div">
-                        <mat-card class="example-card">
-                            <mat-card-title class="movie-title-ca/=rd">IMDB Rating
-                                <!-- <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i> -->
-                            </mat-card-title>
-                            <mat-card-content>
-                                <h5>{{secondMovieDetails.imdbRating}}</h5>
-                            </mat-card-content>
-                            <mat-card-footer>
-                                <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
-                            </mat-card-footer>
-                        </mat-card>
-                    </section>
-
-                    <section class="award-rm section-div">
-                        <mat-card class="example-card">
-                            <mat-card-title class="movie-title-card">IMDB Votes
-                                <i nz-icon>
-                                    <img class="content-icon-img" rel="icon" type="image/png"
-                                        src="../../../assets/icons/trophy.png">
-                                </i>
-                            </mat-card-title>
-                            <mat-card-content>
-                                <h5>{{secondMovieDetails.imdbVotes}}</h5>
-                            </mat-card-content>
-                            <mat-card-footer>
-                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-                            </mat-card-footer>
-                        </mat-card>
-                    </section>
-
-                    <section class="metascore=rm">
-
                     </section>
                 </div>
                 <!-- <app-search-result></app-search-result> -->

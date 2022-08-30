@@ -36,6 +36,8 @@ export class SearchComponent implements OnInit {
   firstMovieDetails: MovieDetails;
   secondMovieDetails: MovieDetails;
 
+  movieDetailKeys: Array<string> = ['Awards', 'BoxOffice', 'Metascore', 'imdbRating', 'imdbVotes']
+
   ngOnInit(): void {
   }
 
@@ -70,6 +72,17 @@ export class SearchComponent implements OnInit {
       }
       this.isLoadingResult = false;
     });
+  }
+
+  public getMovieDetailValues(key, movieSide: number): string {
+    switch (movieSide) {
+      case MOVIEINPUT.FIRST:
+        return this.firstMovieDetails[key];
+      case MOVIEINPUT.SECOND:
+        return this.secondMovieDetails[key];
+      default:
+        return 'N/A';
+    }
   }
 
 
@@ -148,9 +161,9 @@ export class SearchComponent implements OnInit {
     }
   }
 
-  public getIMDBVotesColor(votes){
-    if(votes){
-      votes = parseInt(votes.replaceAll(",",""));
+  public getIMDBVotesColor(votes) {
+    if (votes) {
+      votes = parseInt(votes.replaceAll(",", ""));
     }
     if (votes <= 4000) {
       return "#e9537f";
@@ -159,6 +172,40 @@ export class SearchComponent implements OnInit {
     } else {
       return "#00d1b2";
     }
+  }
+
+  public getWinningPercentageColour(awards) {
+    let percentage = this.calculateWiningPercentage(awards);
+    if (percentage > 70 && percentage <= 100) {
+      return "#00d1b2";
+    } else if (percentage > 40 && percentage <= 70) {
+      return "#8f8fee";
+    } else if (percentage > 0 && percentage <= 40) {
+      return "#e5e4e2";
+    } else {
+      return "#e9537f";
+    }
+  }
+
+  public calculateWiningPercentage(award: string) {
+    let awardNomination = award.match(/\d+/g);
+    let awardCount = 0;
+    let nominationCount;
+    //Movie have Both Awards & Nomination
+    if (this.firstMovieDetails.Awards.toLowerCase().includes("wins") &&
+      this.firstMovieDetails.Awards.toLowerCase().includes("nomination")) {
+      const splitAwardDetails = this.firstMovieDetails.Awards.split('&');
+      awardCount = awardCount + parseInt(splitAwardDetails[0].match(/\d+/g)[0]);
+      nominationCount = parseInt(splitAwardDetails[1].match(/\d+/g)[0]);
+    }
+    if (nominationCount == undefined) {
+      return 0;
+    }
+    //General common formulae to calculate winning percentage
+    return Math.floor((awardCount / parseInt(nominationCount)) * 100
+    );
+
+
   }
 }
 
