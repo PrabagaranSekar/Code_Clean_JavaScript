@@ -10,16 +10,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgZorroAntdModule } from 'src/shared/ng-zorro-ant-module';
 import { SearchComponent } from './feature/movie-detail/search/search.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { FeatureModule } from './feature/feature.module';
+import { ErrorShowingComponent } from './shared/error-showing/error-showing.component';
+import { MovieHttpInteceptor } from './shared/HttpInterceptor';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    SearchComponent
+    SearchComponent,
+    ErrorShowingComponent
   ],
   imports: [
     BrowserModule,
