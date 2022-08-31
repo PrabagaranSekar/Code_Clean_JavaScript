@@ -11,15 +11,16 @@
     align-items: center;
     flex-wrap: nowrap;
     flex-direction: row;
-    height: 100px;
+    height: 80px;
     font-family: emoji;
     font-size: 2rem;
 }
-.content-icon-img{
+
+.content-icon-img {
     height: 80px;
     width: 80px;
 }
 
-.title-room{
-    margin-right: 8px;
+.title-room {
+    /* margin-right: 8px; */
 }

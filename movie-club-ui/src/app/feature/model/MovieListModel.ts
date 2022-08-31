@@ -11,3 +11,13 @@ export interface MovieData {
     Year: string;
     imdbID: string;
 }
+
+export interface RecentlySearchedMovie {
+    firstMovie: RecentMovieVo;
+    secondMovie: RecentMovieVo;
+}
+
+export interface RecentMovieVo {
+    Title: string;
+    imdbID: string;
+}

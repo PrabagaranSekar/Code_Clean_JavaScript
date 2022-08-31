@@ -14,14 +14,12 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { FeatureModule } from './feature/feature.module';
-import { SearchResultComponent } from './feature/movie-detail/search-result/search-result.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    SearchComponent,
-    SearchResultComponent
+    SearchComponent
   ],
   imports: [
     BrowserModule,

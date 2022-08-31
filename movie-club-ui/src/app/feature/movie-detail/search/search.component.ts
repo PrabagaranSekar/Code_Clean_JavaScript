@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, map, Observable, startWith, Subject } from 'rxjs';
-import { MOVIEINPUT } from '../../const/common-const';
+import { MOVIEINPUT, SCORECODE } from '../../const/common-const';
 import { MovieDetails } from '../../model/movie-rating-detail';
-import { MovieData } from '../../model/MovieListModel';
+import { MovieData, RecentlySearchedMovie } from '../../model/MovieListModel';
 import { MovieDetailsService } from '../../services/movie-detail';
 import { MovieSearchService } from '../../services/movie-services';
+import { debounceTime, throwIfEmpty } from 'rxjs/operators';
+import { WeeklyMovies } from '../../services/week-movies';
 
 @Component({
   selector: 'app-search',
@@ -15,6 +17,8 @@ import { MovieSearchService } from '../../services/movie-services';
 })
 export class SearchComponent implements OnInit {
 
+  movieFormGroup: FormGroup;
+
   //inputKey
   movieSearchKeyword: string = 'Title';
 
@@ -22,8 +26,8 @@ export class SearchComponent implements OnInit {
   errorMsg: string;
   isLoadingResult: boolean;
 
-  firstMovieName: string;
-  secondMovieName: string;
+  // firstMovieName: string;
+  // secondMovieName: string;
 
   isFirstMovieResponse: boolean = false;
   isSecondMovieResponse: boolean = false;
@@ -36,18 +40,35 @@ export class SearchComponent implements OnInit {
   firstMovieDetails: MovieDetails;
   secondMovieDetails: MovieDetails;
 
+  //Recently Searched Movie List
+  recentlySearchedMovies: Array<RecentlySearchedMovie> = []
+
+  weeklyHotMovies: Array<RecentlySearchedMovie> = []
+
   movieDetailKeys: Array<string> = ['Awards', 'BoxOffice', 'Metascore', 'imdbRating', 'imdbVotes']
 
   ngOnInit(): void {
+
+    this.movieFormGroup = this.formBuilder.group({
+      firstMovie: ['', Validators.required],
+      secondMovie: ['', Validators.required]
+    })
+    //Get Recently Searched Movies
+    let localStoredMovie = JSON.parse(localStorage.getItem('recentMovies'));
+    this.recentlySearchedMovies = localStoredMovie == null ? [] : localStoredMovie;
+
+    //HOTMOVIES(WEEK)
+    this.weeklyHotMovies = WeeklyMovies;
   }
 
-  constructor(private movieSearchService: MovieSearchService, private movieDetailService: MovieDetailsService) {
+  constructor(private movieSearchService: MovieSearchService,
+    private formBuilder: FormBuilder,
+    private movieDetailService: MovieDetailsService) {
   }
 
-
-  public getMovieSuggestionList(movieName: string, movieSide: number): void {
+  public getMovieSuggestionList(movieName: any, movieSide: number): void {
     this.isLoadingResult = true;
-    this.movieSearchService.getMovieByName(movieName).subscribe(data => {
+    this.movieSearchService.getMovieByName(movieName).pipe(debounceTime(500)).subscribe(data => {
       if (data['Search'] == undefined) {
         switch (movieSide) {
           case MOVIEINPUT.FIRST:
@@ -60,18 +81,28 @@ export class SearchComponent implements OnInit {
         this.errorMsg = data['Error'];
       } else {
         switch (movieSide) {
-          case MOVIEINPUT.SECOND:
-            this.secondMovieSuggestionList = data['Search'];
-            break;
           case MOVIEINPUT.FIRST:
+            //Remove Duplicate value
+            if (this.secondMovieDetails) {
+              data['Search'].splice(data['Search'].findIndex(val => val.imdbID === this.secondMovieDetails.imdbID), 1);
+            }
             this.firstMovieSuggestionList = data['Search'];
             break;
-
+          case MOVIEINPUT.SECOND:
+            //Remove Duplicate value
+            if (this.firstMovieDetails) {
+              data['Search'].splice(data['Search'].findIndex(val => val.imdbID === this.firstMovieDetails.imdbID), 1);
+            }
+            this.secondMovieSuggestionList = data['Search'];
+            break;
         }
-
       }
       this.isLoadingResult = false;
     });
+  }
+
+  get movieFormControl() {
+    return this.movieFormGroup.controls;
   }
 
   public getMovieDetailValues(key, movieSide: number): string {
@@ -87,12 +118,21 @@ export class SearchComponent implements OnInit {
 
 
 
-  searchCleared() {
-    console.log('searchCleared');
+  searchCleared(movieSide: number) {
+    switch (movieSide) {
+      case MOVIEINPUT.FIRST:
+        this.isFirstMovieResponse = false;
+        this.firstMovieDetails = null;
+        break
+      case MOVIEINPUT.SECOND:
+        this.isSecondMovieResponse = false;
+        this.secondMovieDetails = null;
+        break
+    }
   }
 
-  selectedMovie(movieDetail: MovieData, movieSide: number) {
-    this.movieSearchService.getMovieDetailByID(movieDetail.imdbID).subscribe(res => {
+  selectedMovie(imdbID: string, movieSide: number): void {
+    this.movieSearchService.getMovieDetailByID(imdbID).pipe(debounceTime(500)).subscribe(res => {
       switch (movieSide) {
         case MOVIEINPUT.FIRST:
           this.movieDetailService.setFirstMovieDetail(res);
@@ -104,46 +144,69 @@ export class SearchComponent implements OnInit {
           this.secondMovieDetails = res;
           this.isSecondMovieResponse = true;
           break;
-
       }
-      console.log(res);
+      if (this.movieFormGroup.valid) {
+        let newSearchMovie: RecentlySearchedMovie = {
+          firstMovie: this.firstMovieDetails,
+          secondMovie: this.secondMovieDetails
+        }
+        let firstMovieName = this.movieFormControl['firstMovie'].value.Title;
+        let secondMovieName = this.movieFormControl['secondMovie'].value.Title
+        let alreadyChecked = this.recentlySearchedMovies.filter(a => (a.firstMovie.Title === firstMovieName ||
+          a.firstMovie.Title === secondMovieName) &&
+          (a.secondMovie.Title === firstMovieName ||
+            a.secondMovie.Title === secondMovieName))
+        if (alreadyChecked.length == 0) {
+          if (this.recentlySearchedMovies.length > 4) {
+            this.recentlySearchedMovies.splice(1, 1);
+          }
+          this.recentlySearchedMovies.push(newSearchMovie);
+          localStorage.setItem('recentMovies', JSON.stringify(this.recentlySearchedMovies));
+        }
+      }
     })
-    // do something with selected item
+
   }
 
   onChangeSearch(val: string) {
-    // fetch remote data from here
-    // And reassign the 'data' which is binded to 'data' property.
   }
 
   onFocused(e) {
-    // do something when input is focused
+  }
+
+  public researchRecentMovie(recentMovie: RecentlySearchedMovie) {
+    this.selectedMovie(recentMovie.firstMovie.imdbID, MOVIEINPUT.FIRST);
+    this.selectedMovie(recentMovie.secondMovie.imdbID, MOVIEINPUT.SECOND);
+    this.movieFormControl['firstMovie'].setValue(recentMovie.firstMovie)
+    this.movieFormControl['secondMovie'].setValue(recentMovie.secondMovie)
+    // this.firstMovieName = recentMovie.firstMovie.Title;
+    // this.secondMovieName = recentMovie.secondMovie.Title;
   }
 
 
-  public calculateMetaScore(movieDetail): string {
-    const movieMetaScore = parseInt(movieDetail.Metascore);
-    if (movieMetaScore === undefined || isNaN(movieMetaScore)) {
-      return " #e5e4e2";
-    } else if (movieMetaScore <= 50) {
-      return "#e9537f";
+  public calculateMetaScore(metaScore): string {
+    const movieMetaScore = parseInt(metaScore);
+    if (movieMetaScore > 75) {
+      return SCORECODE.HIGH;
     } else if (movieMetaScore > 50 && movieMetaScore <= 75) {
-      return "8f8fee";
+      return SCORECODE.AVERAGE;
+    } else if (movieMetaScore <= 50) {
+      return SCORECODE.BELOW_AVERAGE;
     } else {
-      return "#00d1b2";
+      return SCORECODE.LOW;
     }
   }
 
   public getImdbRatingColor(imdbRating): string {
     const scoreNew = parseFloat(imdbRating);
-    if (scoreNew === undefined || isNaN(scoreNew)) {
-      return "#e5e4e2";
-    } else if (scoreNew <= 5) {
-      return "#e9537f";
+    if (scoreNew > 7.5) {
+      return SCORECODE.HIGH;
     } else if (scoreNew > 5 && scoreNew <= 7.5) {
-      return "#8f8fee";
+      return SCORECODE.AVERAGE;
+    } else if (scoreNew <= 5) {
+      return SCORECODE.BELOW_AVERAGE;
     } else {
-      return "#00d1b2";
+      return SCORECODE.LOW;
     }
   }
 
@@ -152,49 +215,53 @@ export class SearchComponent implements OnInit {
     if (boxOfficeCollection) {
       earningNew = boxOfficeCollection.substring(1).replaceAll(",", "");
     }
-    if (earningNew <= 50000000) {
-      return "#e9537f";
-    } else if (earningNew > 50000000 && earningNew <= 100000000) {
-      return "#8f8fee";
+    if (earningNew > 75000000) {
+      return SCORECODE.HIGH
+    } else if (earningNew > 50000000 && earningNew <= 75000000) {
+      return SCORECODE.AVERAGE;
+    } else if (earningNew > 25000000 && earningNew <= 50000000) {
+      return SCORECODE.BELOW_AVERAGE;
     } else {
-      return "#00d1b2";
+      return SCORECODE.LOW;
     }
   }
 
-  public getIMDBVotesColor(votes) {
+  public getIMDBVotesColor(votes): string {
     if (votes) {
       votes = parseInt(votes.replaceAll(",", ""));
     }
-    if (votes <= 4000) {
-      return "#e9537f";
-    } else if (votes > 4000 && votes <= 10000) {
-      return "#8f8fee";
+    if (votes > 9000) {
+      return SCORECODE.HIGH;
+    } else if (votes > 5000 && votes <= 9000) {
+      return SCORECODE.AVERAGE;
+    } else if (votes > 4000 && votes <= 5000) {
+      return SCORECODE.AVERAGE;
     } else {
-      return "#00d1b2";
+      return SCORECODE.LOW;
     }
   }
 
-  public getWinningPercentageColour(awards) {
-    let percentage = this.calculateWiningPercentage(awards);
-    if (percentage > 70 && percentage <= 100) {
-      return "#00d1b2";
+  public getWinningPercentageColour(movieDetail: MovieDetails) {
+    let percentage = this.calculateWiningPercentage(movieDetail);
+    if (percentage > 70) {
+      return SCORECODE.HIGH;
     } else if (percentage > 40 && percentage <= 70) {
-      return "#8f8fee";
+      return SCORECODE.AVERAGE;
     } else if (percentage > 0 && percentage <= 40) {
-      return "#e5e4e2";
+      return SCORECODE.BELOW_AVERAGE;
     } else {
-      return "#e9537f";
+      return SCORECODE.LOW;
     }
   }
 
-  public calculateWiningPercentage(award: string) {
-    let awardNomination = award.match(/\d+/g);
+  public calculateWiningPercentage(movie: MovieDetails) {
+    // let awardNomination = award.match(/\d+/g);
     let awardCount = 0;
     let nominationCount;
     //Movie have Both Awards & Nomination
-    if (this.firstMovieDetails.Awards.toLowerCase().includes("wins") &&
-      this.firstMovieDetails.Awards.toLowerCase().includes("nomination")) {
-      const splitAwardDetails = this.firstMovieDetails.Awards.split('&');
+    if (movie.Awards.toLowerCase().includes("wins") &&
+      movie.Awards.toLowerCase().includes("nomination")) {
+      const splitAwardDetails = movie.Awards.split('&');
       awardCount = awardCount + parseInt(splitAwardDetails[0].match(/\d+/g)[0]);
       nominationCount = parseInt(splitAwardDetails[1].match(/\d+/g)[0]);
     }

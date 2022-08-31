@@ -9,6 +9,21 @@
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-body{
+body {
     font-family: emoji !important;
+}
+
+/* Overwriting Component Css Properties */
+.ant-card-head {
+    background-color: #0d9489 !important;
+    color: white !important;
+}
+
+.ant-card-body {
+    background-color: #ceeacc;
+    color: black;
+}
+
+.ant-layout-header {
+    padding: 0px 20px;
 }
