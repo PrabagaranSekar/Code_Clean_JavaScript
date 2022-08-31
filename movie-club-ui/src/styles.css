@@ -27,3 +27,7 @@ body {
 .ant-layout-header {
     padding: 0px 20px;
 }
+
+.error-panel {
+    background-color: red;
+}
