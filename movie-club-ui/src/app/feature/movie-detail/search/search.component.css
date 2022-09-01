@@ -5,6 +5,24 @@
     padding: 32px 40px;
 }
 
+.spinner {
+    align-items: center;
+    z-index: 1000;
+    align-items: center;
+    z-index: 100;
+    left: 33%;
+    top: 50%;
+    position: absolute;
+    margin: 0px auto;
+    -webkit-animation: rotation .6s infinite linear;
+    -moz-animation: rotation .6s infinite linear;
+    -o-animation: rotation .6s infinite linear;
+    animation: rotation .6s infinite linear;
+    border-bottom: 6px solid rgba(0, 174, 239, .15);
+    border-top: 6px solid rgba(0, 174, 239, .8);
+    border-radius: 100%;
+}
+
 .flat-left-room {
     width: 74%;
     margin-right: 16px;

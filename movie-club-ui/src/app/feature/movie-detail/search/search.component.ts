@@ -53,6 +53,7 @@ import {
 export class SearchComponent implements OnInit {
 
   ready: boolean = false;
+  displaySpinner: boolean = false;
   movieFormGroup: FormGroup;
 
   //inputKey
@@ -168,6 +169,7 @@ export class SearchComponent implements OnInit {
   }
 
   selectedMovie(imdbID: string, movieSide: number): void {
+    this.displaySpinner = true;
     this.movieSearchService.getMovieDetailByID(imdbID).pipe(debounceTime(500)).subscribe(res => {
       switch (movieSide) {
         case MOVIEINPUT.FIRST:
@@ -180,9 +182,8 @@ export class SearchComponent implements OnInit {
           break;
       }
       this.setRecentMovieInLocal();
-
+      this.displaySpinner = false;
     })
-
   }
 
   onChangeSearch(val: string) { }
@@ -190,6 +191,7 @@ export class SearchComponent implements OnInit {
   onFocused(e) { }
 
   public researchRecentMovieData(recentMovie: RecentlySearchedMovie) {
+    this.displaySpinner = true;
     combineLatest([this.movieSearchService.getMovieDetailByID(recentMovie.firstMovie.imdbID),
     this.movieSearchService.getMovieDetailByID(recentMovie.secondMovie.imdbID)]).pipe(debounceTime(500)).subscribe(([res1, res2]) => {
       this.firstMovieDetails = res1;
@@ -199,6 +201,7 @@ export class SearchComponent implements OnInit {
       this.movieFormControl['firstMovie'].setValue(recentMovie.firstMovie);
       this.movieFormControl['secondMovie'].setValue(recentMovie.secondMovie);
       this.setRecentMovieInLocal();
+      this.displaySpinner = false;
     })
   }
 

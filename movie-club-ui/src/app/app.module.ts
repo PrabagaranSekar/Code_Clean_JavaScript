@@ -16,13 +16,15 @@ import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { FeatureModule } from './feature/feature.module';
 import { ErrorShowingComponent } from './shared/error-showing/error-showing.component';
 import { MovieHttpInteceptor } from './shared/HttpInterceptor';
+import { SpinnierComponent } from './shared/spinnier/spinnier.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     SearchComponent,
-    ErrorShowingComponent
+    ErrorShowingComponent,
+    SpinnierComponent
   ],
   imports: [
     BrowserModule,
