@@ -1,8 +1,7 @@
 <div class="search-flat" *ngIf="ready">
-    <div class="flat-left-room" [formGroup]="movieFormGroup">
 
-        <!-- First Movie Search -->
-        <div class="left-room-left">
+    <div class="flat-left-room" [formGroup]="movieFormGroup">
+        <div class="flat-row-1">
             <div class="mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Search for a movie</label>
                 <ng-autocomplete id="firstMovie" [data]="firstMovieSuggestionList" formControlName="firstMovie"
@@ -14,49 +13,8 @@
                 </ng-autocomplete>
 
             </div>
-            <div class="flat-left-room-result" *ngIf="isFirstMovieResponse">
-                <div>
-                    <section class=" movie-title-card movie-title-card-rm section-div">
-                        <div class="poster-rm">
-                            <img class="movie-poster" [src]="firstMovieDetails.Poster">
-                        </div>
-                        <div class="content-rm">
-                            <h1>{{firstMovieDetails.Title}}</h1>
-                            <h4>{{firstMovieDetails.Genre}}</h4>
-                            <p>{{firstMovieDetails.Plot}}</p>
-                        </div>
 
-                    </section>
-                    <section>
-
-
-                        <section class="movie-title section-div" *ngFor="let key of movieDetailKeys">
-                            <mat-card class="example-card"
-                                [ngStyle]="{'background-color':key === 'BoxOffice' ? getBoxOfficeColor(firstMovieDetails[key]) :
-                                                                     key === 'Metascore' ? calculateMetaScore(firstMovieDetails[key]) : 
-                                                                    key === 'imdbRating' ? getImdbRatingColor(firstMovieDetails[key]) : 
-                                                                key === 'imdbVotes' ? getIMDBVotesColor(firstMovieDetails[key]) :
-                                                            key === 'Awards' ? getWinningPercentageColour(firstMovieDetails) : 
-                                                        key === 'Movie Winning Percentage' ? getWinningPercentageColour(firstMovieDetails) : '#ffcf76' }">
-                                <mat-card-title class="movie-title-card">
-                                    {{key==='imdbRating'?'IMDB Rating':key==='imdbVotes'?'IMDB Votes':key}}
-                                </mat-card-title>
-                                <mat-card-content>
-                                    <p *ngIf="key === 'Movie Winning Percentage'">
-                                        {{calculateWiningPercentage(firstMovieDetails)}}</p>
-                                    <p *ngIf="key != 'Movie Winning Percentage'">{{firstMovieDetails[key]}}</p>
-                                </mat-card-content>
-                            </mat-card>
-                        </section>
-                    </section>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- Second Movie Search -->
-        <div class="left-room-right">
-            <div class="mb-3">
+            <div class="mb-3" [ngStyle]="{'padding-left': '4px'}">
                 <label for="exampleFormControlInput1" class="form-label">Search for a movie</label>
                 <ng-autocomplete id="firstMovie" [data]="secondMovieSuggestionList" formControlName="secondMovie"
                     historyIdentifier='secondMovieSuggestionList' [searchKeyword]="movieSearchKeyword"
@@ -66,41 +24,97 @@
                     [isLoading]="isLoadingResult" [minQueryLength]="2" placeHolder="Search Movies. eg 'gun'">
                 </ng-autocomplete>
             </div>
-            <div class="flat-right-room-result" *ngIf="isSecondMovieResponse">
-                <div>
-                    <section class="movie-title-card movie-title-card-rm section-div">
-                        <div class="poster-rm">
-                            <img class="movie-poster" [src]="secondMovieDetails.Poster">
-                        </div>
-                        <div class="content-rm">
-                            <h1>{{secondMovieDetails.Title}}</h1>
-                            <h4>{{secondMovieDetails.Genre}}</h4>
-                            <p>{{secondMovieDetails.Plot}}</p>
-                        </div>
-                    </section>
-                    <section>
+        </div>
+        <div class="flat-row-2" *ngIf="isFirstMovieResponse || isSecondMovieResponse">
+            <!-- First Movie Search -->
+            <div class="left-room-left">
+                <div class="flat-left-room-result" *ngIf="isFirstMovieResponse">
+                    <div>
+                        <section class=" movie-title-card movie-title-card-rm section-div">
+                            <p class="poster-rm">
+                                <img class="movie-poster" [src]="firstMovieDetails.Poster">
+                            </p>
+                            <div class="content-rm">
+                                <h1>{{firstMovieDetails.Title}}</h1>
+                                <h4>{{firstMovieDetails.Genre}}</h4>
+                                <p>{{firstMovieDetails.Plot}}</p>
+                            </div>
+
+                        </section>
+                        <section>
 
 
-                        <section class="movie-title section-div" *ngFor="let key of movieDetailKeys">
-                            <mat-card class="example-card" [ngStyle]="{'background-color':key === 'BoxOffice' ? getBoxOfficeColor(secondMovieDetails[key]) :
+                            <section class="movie-title section-div" *ngFor="let key of movieDetailKeys">
+                                <mat-card class="example-card"
+                                    [ngStyle]="{'background-color':key === 'BoxOffice' ? getBoxOfficeColor(firstMovieDetails[key]) :
+                                                                     key === 'Metascore' ? calculateMetaScore(firstMovieDetails[key]) : 
+                                                                    key === 'imdbRating' ? getImdbRatingColor(firstMovieDetails[key]) : 
+                                                                key === 'imdbVotes' ? getIMDBVotesColor(firstMovieDetails[key]) :
+                                                            key === 'Awards' ? getWinningPercentageColour(firstMovieDetails) : 
+                                                        key === 'Movie Winning Percentage' ? getWinningPercentageColour(firstMovieDetails) : '#ffcf76' }">
+                                    <mat-card-title class="movie-title-card">
+                                        {{key==='imdbRating'?'IMDB Rating':key==='imdbVotes'?'IMDB Votes':key}}
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <p *ngIf="key === 'Movie Winning Percentage'">
+                                            {{calculateWiningPercentage(firstMovieDetails)}}</p>
+                                        <p *ngIf="key != 'Movie Winning Percentage'">{{firstMovieDetails[key]}}</p>
+                                    </mat-card-content>
+                                </mat-card>
+                            </section>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Second Movie Search -->
+            <div class="left-room-right">
+                <div class="flat-right-room-result" *ngIf="isSecondMovieResponse">
+                    <div>
+                        <section class="movie-title-card movie-title-card-rm section-div">
+                            <p class="poster-rm">
+                                <img class="movie-poster" [src]="secondMovieDetails.Poster">
+                            </p>
+                            <div class="content-rm">
+                                <h1>{{secondMovieDetails.Title}}</h1>
+                                <h4>{{secondMovieDetails.Genre}}</h4>
+                                <p>{{secondMovieDetails.Plot}}</p>
+                            </div>
+                        </section>
+                        <section>
+
+
+                            <section class="movie-title section-div" *ngFor="let key of movieDetailKeys">
+                                <mat-card class="example-card" [ngStyle]="{'background-color':key === 'BoxOffice' ? getBoxOfficeColor(secondMovieDetails[key]) :
                              key === 'Metascore' ? calculateMetaScore(secondMovieDetails[key]) : 
                             key === 'imdbRating' ? getImdbRatingColor(secondMovieDetails[key]) : 
                         key === 'imdbVotes' ? getIMDBVotesColor(secondMovieDetails[key]) : 
                     key === 'Awards' ? getWinningPercentageColour(secondMovieDetails) : 
                 key === 'Movie Winning Percentage' ? getWinningPercentageColour(secondMovieDetails) : '#ffcf76'   }">
-                                <mat-card-title class="movie-title-card">
-                                    {{key==='imdbRating'?'IMDB Rating':key==='imdbVotes'?'IMDB Votes':key}}
-                                </mat-card-title>
-                                <mat-card-content>
-                                    <p *ngIf="key === 'Movie Winning Percentage'">
-                                        {{calculateWiningPercentage(secondMovieDetails)}}</p>
-                                    <p *ngIf="key != 'Movie Winning Percentage'">{{secondMovieDetails[key]}}</p>
-                                </mat-card-content>
-                            </mat-card>
+                                    <mat-card-title class="movie-title-card">
+                                        {{key==='imdbRating'?'IMDB Rating':key==='imdbVotes'?'IMDB Votes':key}}
+                                    </mat-card-title>
+                                    <mat-card-content>
+                                        <p *ngIf="key === 'Movie Winning Percentage'">
+                                            {{calculateWiningPercentage(secondMovieDetails)}}</p>
+                                        <p *ngIf="key != 'Movie Winning Percentage'">{{secondMovieDetails[key]}}</p>
+                                    </mat-card-content>
+                                </mat-card>
+                            </section>
                         </section>
-                    </section>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <div class="info-content" *ngIf="!isFirstMovieResponse && !isSecondMovieResponse">
+            <h2>
+                Search for a movie on both sides
+            </h2>
+            <p>
+                We will tell you which is best
+            </p>
         </div>
     </div>
 
@@ -111,7 +125,8 @@
             </div>
             <p *ngIf="recentlySearchedMovies.length !== 0">
                 <a *ngFor="let mov of recentlySearchedMovies">
-                    <p (click)="researchRecentMovieData(mov)">{{mov.firstMovie.Title}} VS {{mov.secondMovie.Title}}
+                    <p (click)="researchRecentMovieData(mov)">
+                        {{mov.firstMovie.Title + ' VS ' + mov.secondMovie.Title}}
                     </p>
                 </a>
             </p>
