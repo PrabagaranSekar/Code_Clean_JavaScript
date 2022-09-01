@@ -1,6 +1,4 @@
-import {
-    RecentlySearchedMovie
-} from "../model/MovieListModel";
+import { RecentlySearchedMovie } from "../model/MovieListModel";
 
 export const WeeklyMovies: Array<RecentlySearchedMovie> = [{
     firstMovie: {

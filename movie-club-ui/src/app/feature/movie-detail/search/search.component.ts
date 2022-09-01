@@ -1,49 +1,13 @@
-import {
-  HttpClient
-} from '@angular/common/http';
-import {
-  AfterViewInit,
-  Component,
-  OnInit
-} from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators
-} from '@angular/forms';
-import {
-  BehaviorSubject,
-  combineLatest,
-  map,
-  Observable,
-  startWith,
-  Subject
-} from 'rxjs';
-import {
-  MOVIEINPUT,
-  SCORECODE
-} from '../../const/common-const';
-import {
-  MovieDetails
-} from '../../model/movie-rating-detail';
-import {
-  MovieData,
-  RecentlySearchedMovie
-} from '../../model/MovieListModel';
-import {
-  MovieDetailsService
-} from '../../services/movie-detail';
-import {
-  MovieSearchService
-} from '../../services/movie-services';
-import {
-  debounceTime,
-  throwIfEmpty
-} from 'rxjs/operators';
-import {
-  WeeklyMovies
-} from '../../services/week-movies';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { combineLatest } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { MOVIEINPUT, SCORECODE } from '../../const/common-const';
+import { MovieDetails } from '../../model/movie-rating-detail';
+import { MovieData, RecentlySearchedMovie } from '../../model/MovieListModel';
+import { MovieDetailsService } from '../../services/movie-detail';
+import { MovieSearchService } from '../../services/movie-services';
+import { WeeklyMovies } from '../../services/week-movies';
 
 @Component({
   selector: 'app-search',
@@ -87,6 +51,7 @@ export class SearchComponent implements OnInit {
   constructor(private movieSearchService: MovieSearchService,
     private formBuilder: FormBuilder,
     private movieDetailService: MovieDetailsService) { }
+
   ngOnInit(): void {
 
     this.movieFormGroup = this.formBuilder.group({
@@ -153,9 +118,7 @@ export class SearchComponent implements OnInit {
     }
   }
 
-
-
-  searchCleared(movieSide: number) {
+  public searchCleared(movieSide: number) {
     switch (movieSide) {
       case MOVIEINPUT.FIRST:
         this.isFirstMovieResponse = false;
@@ -168,7 +131,7 @@ export class SearchComponent implements OnInit {
     }
   }
 
-  selectedMovie(imdbID: string, movieSide: number): void {
+  public selectedMovie(imdbID: string, movieSide: number): void {
     this.displaySpinner = true;
     this.movieSearchService.getMovieDetailByID(imdbID).pipe(debounceTime(500)).subscribe(res => {
       switch (movieSide) {
@@ -185,10 +148,6 @@ export class SearchComponent implements OnInit {
       this.displaySpinner = false;
     })
   }
-
-  onChangeSearch(val: string) { }
-
-  onFocused(e) { }
 
   public researchRecentMovieData(recentMovie: RecentlySearchedMovie) {
     this.displaySpinner = true;
@@ -319,7 +278,5 @@ export class SearchComponent implements OnInit {
     }
     //General common formulae to calculate winning percentage
     return Math.floor((awardCount / parseInt(nominationCount)) * 100);
-
-
   }
 }
