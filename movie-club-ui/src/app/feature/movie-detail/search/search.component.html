@@ -1,14 +1,16 @@
+<!-- Spinner display Area -->
 <div *ngIf="displaySpinner"
   class="d-flex justify-content-center spinner">
   <app-spinnier></app-spinnier>
 </div>
 
+<!-- Main Area -->
 <div class="search-flat"
   *ngIf="ready">
-
   <div class="flat-left-room"
     [formGroup]="movieFormGroup">
     <div class="flat-row-1">
+      <!-- First Movie Search Input  -->
       <div class="mb-3">
         <label for="exampleFormControlInput1"
           class="form-label">Search for a movie</label>
@@ -29,6 +31,7 @@
         </ng-autocomplete>
       </div>
 
+      <!-- Second Movie Search Input  -->
       <div class="mb-3"
         [ngStyle]="{'padding-left': '4px'}">
         <label for="exampleFormControlInput1"
@@ -51,9 +54,9 @@
       </div>
     </div>
     <div>
+      <!-- First Movie Search Result Area -->
       <div class="flat-row-2"
         *ngIf="isFirstMovieResponse || isSecondMovieResponse">
-        <!-- First Movie Search -->
         <div class="left-room-left">
           <div class="flat-left-room-result"
             *ngIf="isFirstMovieResponse">
@@ -93,6 +96,7 @@
             </div>
           </div>
         </div>
+
         <!-- Second Movie Search -->
         <div class="left-room-right">
           <div class="flat-right-room-result"
@@ -134,6 +138,8 @@
           </div>
         </div>
       </div>
+
+      <!-- User Search Display Message Area -->
       <div class="info-content"
         *ngIf="!isFirstMovieResponse && !isSecondMovieResponse">
         <h2>
@@ -146,6 +152,7 @@
     </div>
   </div>
 
+  <!-- Recent Search Movies List Area -->
   <div class="flat-right-room">
     <nz-card class="card-room"
       nzTitle="Recently Searched Movies">
@@ -161,6 +168,7 @@
       </p>
     </nz-card>
 
+    <!-- Hot Week Movie List Area -->
     <nz-card class="card-room"
       nzTitle="This Week Hot Search">
       <a *ngFor="let recent of weeklyHotMovies">

@@ -2,19 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { MOVIEINPUT, SCORECODE } from '../../const/common-const';
+import { MOVIEINPUT } from '../../const/common-const';
 import { MovieDetails } from '../../model/movie-rating-detail';
 import { MovieData, RecentlySearchedMovie } from '../../model/MovieListModel';
-import { MovieDetailsService } from '../../services/movie-detail';
 import { MovieSearchService } from '../../services/movie-services';
 import { WeeklyMovies } from '../../services/week-movies';
+import { ColourCodeCheck } from './color-check.component';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent extends ColourCodeCheck implements OnInit {
 
   ready: boolean = false;
   displaySpinner: boolean = false;
@@ -49,8 +49,9 @@ export class SearchComponent implements OnInit {
   movieDetailKeys: Array<string> = ['Movie Winning Percentage', 'Awards', 'BoxOffice', 'Metascore', 'imdbRating', 'imdbVotes']
 
   constructor(private movieSearchService: MovieSearchService,
-    private formBuilder: FormBuilder,
-    private movieDetailService: MovieDetailsService) { }
+    private formBuilder: FormBuilder) {
+    super();
+  }
 
   ngOnInit(): void {
 
@@ -67,7 +68,7 @@ export class SearchComponent implements OnInit {
     this.ready = true
   }
 
-
+  //Method To Get Movie SuggestionList Based on Input
   public getMovieSuggestionList(movieName: any, movieSide: number): void {
     this.isLoadingResult = true;
     this.movieSearchService.getMovieByName(movieName).pipe(debounceTime(500)).subscribe(data => {
@@ -103,34 +104,7 @@ export class SearchComponent implements OnInit {
     });
   }
 
-  get movieFormControl() {
-    return this.movieFormGroup.controls;
-  }
-
-  public getMovieDetailValues(key, movieSide: number): string {
-    switch (movieSide) {
-      case MOVIEINPUT.FIRST:
-        return this.firstMovieDetails[key];
-      case MOVIEINPUT.SECOND:
-        return this.secondMovieDetails[key];
-      default:
-        return 'N/A';
-    }
-  }
-
-  public searchCleared(movieSide: number) {
-    switch (movieSide) {
-      case MOVIEINPUT.FIRST:
-        this.isFirstMovieResponse = false;
-        this.firstMovieDetails = null;
-        break
-      case MOVIEINPUT.SECOND:
-        this.isSecondMovieResponse = false;
-        this.secondMovieDetails = null;
-        break
-    }
-  }
-
+  //Method To Get Selected Movie Details
   public selectedMovie(imdbID: string, movieSide: number): void {
     this.displaySpinner = true;
     this.movieSearchService.getMovieDetailByID(imdbID).pipe(debounceTime(500)).subscribe(res => {
@@ -149,7 +123,8 @@ export class SearchComponent implements OnInit {
     })
   }
 
-  public researchRecentMovieData(recentMovie: RecentlySearchedMovie) {
+  //Method To Get Recently Searched Movie Details From Browser Memory
+  public researchRecentMovieData(recentMovie: RecentlySearchedMovie): void {
     this.displaySpinner = true;
     combineLatest([this.movieSearchService.getMovieDetailByID(recentMovie.firstMovie.imdbID),
     this.movieSearchService.getMovieDetailByID(recentMovie.secondMovie.imdbID)]).pipe(debounceTime(500)).subscribe(([res1, res2]) => {
@@ -164,6 +139,40 @@ export class SearchComponent implements OnInit {
     })
   }
 
+
+  //Method To Get Movie Values(i.e Title, IMDBRating etc)
+  public getMovieDetailValues(key, movieSide: number): string {
+    switch (movieSide) {
+      case MOVIEINPUT.FIRST:
+        return this.firstMovieDetails[key];
+      case MOVIEINPUT.SECOND:
+        return this.secondMovieDetails[key];
+      default:
+        return 'N/A';
+    }
+  }
+
+  //Getter method to get FormControl Value
+  get movieFormControl() {
+    return this.movieFormGroup.controls;
+  }
+
+  //Method to Hide Result Area when input cleared
+  public searchCleared(movieSide: number): void {
+    switch (movieSide) {
+      case MOVIEINPUT.FIRST:
+        this.isFirstMovieResponse = false;
+        this.firstMovieDetails = null;
+        break
+      case MOVIEINPUT.SECOND:
+        this.isSecondMovieResponse = false;
+        this.secondMovieDetails = null;
+        break
+    }
+  }
+
+  //Setter Method to set Recently Searched Movies in Browser Menmory
+  //Note : Recently Searched Movie Details will Cleared when Browser Cache Cleared
   private setRecentMovieInLocal(): void {
     if (this.movieFormGroup.valid && this.recentlySearchedMovies) {
       let newSearchMovie: RecentlySearchedMovie = {
@@ -173,6 +182,7 @@ export class SearchComponent implements OnInit {
       let firstMovieName = this.movieFormControl['firstMovie'].value.Title;
       let secondMovieName = this.movieFormControl['secondMovie'].value.Title;
       if (this.recentlySearchedMovies.length > 0) {
+        //Check whether Movie already Searched or not
         let alreadyChecked = this.recentlySearchedMovies.filter(a => (a.firstMovie.Title === firstMovieName ||
           a.firstMovie.Title === secondMovieName) &&
           (a.secondMovie.Title === firstMovieName ||
@@ -189,94 +199,5 @@ export class SearchComponent implements OnInit {
         localStorage.setItem('recentMovies', JSON.stringify(this.recentlySearchedMovies));
       }
     }
-  }
-
-
-  public calculateMetaScore(metaScore): string {
-    const movieMetaScore = parseInt(metaScore);
-    if (movieMetaScore > 75) {
-      return SCORECODE.HIGH;
-    } else if (movieMetaScore > 50 && movieMetaScore <= 75) {
-      return SCORECODE.AVERAGE;
-    } else if (movieMetaScore <= 50) {
-      return SCORECODE.BELOW_AVERAGE;
-    } else {
-      return SCORECODE.LOW;
-    }
-  }
-
-  public getImdbRatingColor(imdbRating): string {
-    const scoreNew = parseFloat(imdbRating);
-    if (scoreNew > 7.5) {
-      return SCORECODE.HIGH;
-    } else if (scoreNew > 5 && scoreNew <= 7.5) {
-      return SCORECODE.AVERAGE;
-    } else if (scoreNew <= 5) {
-      return SCORECODE.BELOW_AVERAGE;
-    } else {
-      return SCORECODE.LOW;
-    }
-  }
-
-  public getBoxOfficeColor(boxOfficeCollection): string {
-    let earningNew;
-    if (boxOfficeCollection) {
-      earningNew = boxOfficeCollection.substring(1).replaceAll(",", "");
-    }
-    if (earningNew > 75000000) {
-      return SCORECODE.HIGH
-    } else if (earningNew > 50000000 && earningNew <= 75000000) {
-      return SCORECODE.AVERAGE;
-    } else if (earningNew > 25000000 && earningNew <= 50000000) {
-      return SCORECODE.BELOW_AVERAGE;
-    } else {
-      return SCORECODE.LOW;
-    }
-  }
-
-  public getIMDBVotesColor(votes): string {
-    if (votes) {
-      votes = parseInt(votes.replaceAll(",", ""));
-    }
-    if (votes > 9000) {
-      return SCORECODE.HIGH;
-    } else if (votes > 5000 && votes <= 9000) {
-      return SCORECODE.AVERAGE;
-    } else if (votes > 4000 && votes <= 5000) {
-      return SCORECODE.AVERAGE;
-    } else {
-      return SCORECODE.LOW;
-    }
-  }
-
-  public getWinningPercentageColour(movieDetail: MovieDetails) {
-    let percentage = this.calculateWiningPercentage(movieDetail);
-    if (percentage > 70) {
-      return SCORECODE.HIGH;
-    } else if (percentage > 40 && percentage <= 70) {
-      return SCORECODE.AVERAGE;
-    } else if (percentage > 0 && percentage <= 40) {
-      return SCORECODE.BELOW_AVERAGE;
-    } else {
-      return SCORECODE.LOW;
-    }
-  }
-
-  public calculateWiningPercentage(movie: MovieDetails) {
-    // let awardNomination = award.match(/\d+/g);
-    let awardCount = 0;
-    let nominationCount;
-    //Movie have Both Awards & Nomination
-    if (movie.Awards.toLowerCase().includes("wins") &&
-      movie.Awards.toLowerCase().includes("nomination")) {
-      const splitAwardDetails = movie.Awards.split('&');
-      awardCount = awardCount + parseInt(splitAwardDetails[0].match(/\d+/g)[0]);
-      nominationCount = parseInt(splitAwardDetails[1].match(/\d+/g)[0]);
-    }
-    if (nominationCount == undefined) {
-      return 0;
-    }
-    //General common formulae to calculate winning percentage
-    return Math.floor((awardCount / parseInt(nominationCount)) * 100);
   }
 }

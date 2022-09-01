@@ -4,7 +4,7 @@ import { SearchComponent } from './movie-detail/search/search.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'movies',
     component: SearchComponent
   }
 ];
