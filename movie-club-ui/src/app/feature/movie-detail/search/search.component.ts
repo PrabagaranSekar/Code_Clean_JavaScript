@@ -1,14 +1,49 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, map, Observable, startWith, Subject } from 'rxjs';
-import { MOVIEINPUT, SCORECODE } from '../../const/common-const';
-import { MovieDetails } from '../../model/movie-rating-detail';
-import { MovieData, RecentlySearchedMovie } from '../../model/MovieListModel';
-import { MovieDetailsService } from '../../services/movie-detail';
-import { MovieSearchService } from '../../services/movie-services';
-import { debounceTime, throwIfEmpty } from 'rxjs/operators';
-import { WeeklyMovies } from '../../services/week-movies';
+import {
+  HttpClient
+} from '@angular/common/http';
+import {
+  AfterViewInit,
+  Component,
+  OnInit
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators
+} from '@angular/forms';
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  Observable,
+  startWith,
+  Subject
+} from 'rxjs';
+import {
+  MOVIEINPUT,
+  SCORECODE
+} from '../../const/common-const';
+import {
+  MovieDetails
+} from '../../model/movie-rating-detail';
+import {
+  MovieData,
+  RecentlySearchedMovie
+} from '../../model/MovieListModel';
+import {
+  MovieDetailsService
+} from '../../services/movie-detail';
+import {
+  MovieSearchService
+} from '../../services/movie-services';
+import {
+  debounceTime,
+  throwIfEmpty
+} from 'rxjs/operators';
+import {
+  WeeklyMovies
+} from '../../services/week-movies';
 
 @Component({
   selector: 'app-search',
@@ -17,6 +52,7 @@ import { WeeklyMovies } from '../../services/week-movies';
 })
 export class SearchComponent implements OnInit {
 
+  ready: boolean = false;
   movieFormGroup: FormGroup;
 
   //inputKey
@@ -45,8 +81,11 @@ export class SearchComponent implements OnInit {
 
   weeklyHotMovies: Array<RecentlySearchedMovie> = []
 
-  movieDetailKeys: Array<string> = ['Awards', 'BoxOffice', 'Metascore', 'imdbRating', 'imdbVotes']
+  movieDetailKeys: Array<string> = ['Movie Winning Percentage', 'Awards', 'BoxOffice', 'Metascore', 'imdbRating', 'imdbVotes']
 
+  constructor(private movieSearchService: MovieSearchService,
+    private formBuilder: FormBuilder,
+    private movieDetailService: MovieDetailsService) { }
   ngOnInit(): void {
 
     this.movieFormGroup = this.formBuilder.group({
@@ -59,12 +98,9 @@ export class SearchComponent implements OnInit {
 
     //HOTMOVIES(WEEK)
     this.weeklyHotMovies = WeeklyMovies;
+    this.ready = true
   }
 
-  constructor(private movieSearchService: MovieSearchService,
-    private formBuilder: FormBuilder,
-    private movieDetailService: MovieDetailsService) {
-  }
 
   public getMovieSuggestionList(movieName: any, movieSide: number): void {
     this.isLoadingResult = true;
@@ -135,23 +171,46 @@ export class SearchComponent implements OnInit {
     this.movieSearchService.getMovieDetailByID(imdbID).pipe(debounceTime(500)).subscribe(res => {
       switch (movieSide) {
         case MOVIEINPUT.FIRST:
-          this.movieDetailService.setFirstMovieDetail(res);
           this.firstMovieDetails = res;
           this.isFirstMovieResponse = true;
           break;
         case MOVIEINPUT.SECOND:
-          this.movieDetailService.setSeconMovieDetail(res);
           this.secondMovieDetails = res;
           this.isSecondMovieResponse = true;
           break;
       }
-      if (this.movieFormGroup.valid) {
-        let newSearchMovie: RecentlySearchedMovie = {
-          firstMovie: this.firstMovieDetails,
-          secondMovie: this.secondMovieDetails
-        }
-        let firstMovieName = this.movieFormControl['firstMovie'].value.Title;
-        let secondMovieName = this.movieFormControl['secondMovie'].value.Title
+      this.setRecentMovieInLocal();
+
+    })
+
+  }
+
+  onChangeSearch(val: string) { }
+
+  onFocused(e) { }
+
+  public researchRecentMovieData(recentMovie: RecentlySearchedMovie) {
+    combineLatest([this.movieSearchService.getMovieDetailByID(recentMovie.firstMovie.imdbID),
+    this.movieSearchService.getMovieDetailByID(recentMovie.secondMovie.imdbID)]).pipe(debounceTime(500)).subscribe(([res1, res2]) => {
+      this.firstMovieDetails = res1;
+      this.isFirstMovieResponse = true;
+      this.secondMovieDetails = res2;
+      this.isSecondMovieResponse = true;
+      this.movieFormControl['firstMovie'].setValue(recentMovie.firstMovie);
+      this.movieFormControl['secondMovie'].setValue(recentMovie.secondMovie);
+      this.setRecentMovieInLocal();
+    })
+  }
+
+  private setRecentMovieInLocal(): void {
+    if (this.movieFormGroup.valid && this.recentlySearchedMovies) {
+      let newSearchMovie: RecentlySearchedMovie = {
+        firstMovie: this.firstMovieDetails,
+        secondMovie: this.secondMovieDetails
+      }
+      let firstMovieName = this.movieFormControl['firstMovie'].value.Title;
+      let secondMovieName = this.movieFormControl['secondMovie'].value.Title;
+      if (this.recentlySearchedMovies.length > 0) {
         let alreadyChecked = this.recentlySearchedMovies.filter(a => (a.firstMovie.Title === firstMovieName ||
           a.firstMovie.Title === secondMovieName) &&
           (a.secondMovie.Title === firstMovieName ||
@@ -163,24 +222,11 @@ export class SearchComponent implements OnInit {
           this.recentlySearchedMovies.push(newSearchMovie);
           localStorage.setItem('recentMovies', JSON.stringify(this.recentlySearchedMovies));
         }
+      } else {
+        this.recentlySearchedMovies.push(newSearchMovie);
+        localStorage.setItem('recentMovies', JSON.stringify(this.recentlySearchedMovies));
       }
-    })
-
-  }
-
-  onChangeSearch(val: string) {
-  }
-
-  onFocused(e) {
-  }
-
-  public researchRecentMovie(recentMovie: RecentlySearchedMovie) {
-    this.selectedMovie(recentMovie.firstMovie.imdbID, MOVIEINPUT.FIRST);
-    this.selectedMovie(recentMovie.secondMovie.imdbID, MOVIEINPUT.SECOND);
-    this.movieFormControl['firstMovie'].setValue(recentMovie.firstMovie)
-    this.movieFormControl['secondMovie'].setValue(recentMovie.secondMovie)
-    // this.firstMovieName = recentMovie.firstMovie.Title;
-    // this.secondMovieName = recentMovie.secondMovie.Title;
+    }
   }
 
 
@@ -269,11 +315,8 @@ export class SearchComponent implements OnInit {
       return 0;
     }
     //General common formulae to calculate winning percentage
-    return Math.floor((awardCount / parseInt(nominationCount)) * 100
-    );
+    return Math.floor((awardCount / parseInt(nominationCount)) * 100);
 
 
   }
 }
-
-
