@@ -34,7 +34,6 @@ import { SpinnierComponent } from './shared/spinnier/spinnier.component';
     AppRoutingModule,
     MaterialModule,
     NgZorroAntdModule,
-    FeatureModule,
     AutocompleteLibModule],
   providers: [],
   bootstrap: [AppComponent]

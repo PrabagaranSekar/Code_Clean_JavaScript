@@ -17,7 +17,7 @@ import { ColourCodeCheck } from './color-check.component';
 export class SearchComponent extends ColourCodeCheck implements OnInit {
 
   ready: boolean = false;
-  displaySpinner: boolean = false;
+  displaySpinner: boolean = true;
   movieFormGroup: FormGroup;
 
   //inputKey
@@ -65,7 +65,8 @@ export class SearchComponent extends ColourCodeCheck implements OnInit {
 
     //HOTMOVIES(WEEK)
     this.weeklyHotMovies = WeeklyMovies;
-    this.ready = true
+    this.ready = true;
+    this.displaySpinner = false;
   }
 
   //Method To Get Movie SuggestionList Based on Input
