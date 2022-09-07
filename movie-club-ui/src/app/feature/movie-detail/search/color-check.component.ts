@@ -11,7 +11,7 @@ export class ColourCodeCheck {
             return SCORECODE.HIGH;
         } else if (movieMetaScore > 50 && movieMetaScore <= 75) {
             return SCORECODE.AVERAGE;
-        } else if (movieMetaScore <= 50) {
+        } else if (movieMetaScore > 30 && movieMetaScore <= 50) {
             return SCORECODE.BELOW_AVERAGE;
         } else {
             return SCORECODE.LOW;
@@ -25,7 +25,7 @@ export class ColourCodeCheck {
             return SCORECODE.HIGH;
         } else if (scoreNew > 5 && scoreNew <= 7.5) {
             return SCORECODE.AVERAGE;
-        } else if (scoreNew <= 5) {
+        } else if (scoreNew > 3 && scoreNew <= 5) {
             return SCORECODE.BELOW_AVERAGE;
         } else {
             return SCORECODE.LOW;
